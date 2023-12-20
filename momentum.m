@@ -1,3 +1,7 @@
+%% Examine the momentum effect
+
+% 这个文档里的路径都是老师的hhh，甚至用的不是相对路径，这个部分就是问题里的（a)叭。
+
 clear
 close all
 
