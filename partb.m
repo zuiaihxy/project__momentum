@@ -1,6 +1,9 @@
-%%  examine momentum strategy by creating a dateset with previous stock returns information
-
-
+%b部分的内容
+%Every K months, sort stocks into five groups based on previous 
+% K months' return and hold this position for K months. What is 
+% the average equal-weighted return spread between high and low 
+% previous stock returns portfolios for K = 1; 3; 6; 12; 24. Do 
+% you find that momentum exists in Chinese stock markets?
 
 load('return_m.mat');
 
@@ -13,12 +16,10 @@ num_obs=length(jdate);
 
 return_monthly.jdate=G;
 
-%frequency=[1,3,6,12,24];
-frequency=[3];
-
+frequency=[1,3,6,12,24];
+%frequency=[3];
 
 mom_old=table();
-
 
 tic 
 
@@ -35,7 +36,6 @@ for i=frequency
          start_date=j+1;
          % furthermore, this date is updated every i months
    
-
         % this returns the relevent index for picking up returns 
         index_i=(return_monthly.jdate==temp_date);
        %  creates a composite index where the sample condition is met 
@@ -51,25 +51,17 @@ for i=frequency
        index_r=(return_monthly.jdate==start_date);
        mom_r=return_monthly(index_r,1:end);
 
-
        mom_sample1=outerjoin(mom_r,pr_return_table,'Keys',{'code'},'MergeKeys',true,'Type','left');
        
-      
        return_full=vertcat(mom_old, mom_sample1);
        
        mom_old=return_full;
         
     end
-
-end
-
-toc
-
-
 % Create percentiles functions
 
-for i=20:20:80
-   eval(['prctile_',num2str(i),'=','@(input)prctile(input,i)',';']);
+for k=20:20:80
+   eval(['prctile_',num2str(k),'=','@(input)prctile(input,k)',';']);
 end
 
 % Calcualte percentiles
@@ -79,7 +71,7 @@ for x=20:20:80
                 eval(['return_full.mom',num2str(x),'=','b*ones(size(return_full,1),1)',';']);
 end
 
-return_full.mom_label=rowfun(@mom_bucket_5,return_full(:,{'pr_return','mom20','mom40','mom60'...
+return_full.mom_label=rowfun(@mom_bucket,return_full(:,{'pr_return','mom20','mom40','mom60'...
                 ,'mom80'}),'OutputFormat','cell');
             
 return_full.ew=ones(size(return_full,1),1);        
@@ -97,6 +89,13 @@ A=nanmean(table2array(mom_factors(:,2)))*100;
 
 E=nanmean(table2array(mom_factors(:,6)))*100;
 
+fprintf('The K is %4.0f \n',i)
+
 fprintf('The average return for the low previous return group is %4.3f percent per month \n',A)
 
 fprintf('The average return for the high previous return group is %4.3f percent per month \n',E)
+end
+
+toc
+
+
